@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from starlette import status
 
-from app.api.dependencies.articles import get_article_by_slug_from_path
+from app.api.dependencies.articles import get_article_by_slug_from_path, get_favorite_feed_filters
 from app.api.dependencies.authentication import get_current_user_authorizer
 from app.api.dependencies.database import get_repository
 from app.db.repositories.articles import ArticlesRepository
@@ -12,6 +12,7 @@ from app.models.schemas.articles import (
     DEFAULT_ARTICLES_OFFSET,
     ArticleForResponse,
     ArticleInResponse,
+    FavoriteFeedFilters,
     ListOfArticlesInResponse,
 )
 from app.resources import strings
@@ -34,6 +35,31 @@ async def get_articles_for_user_feed(
         user=user,
         limit=limit,
         offset=offset,
+    )
+    articles_for_response = [
+        ArticleForResponse(**article.dict()) for article in articles
+    ]
+    return ListOfArticlesInResponse(
+        articles=articles_for_response,
+        articles_count=len(articles),
+    )
+
+
+@router.get(
+    "/favorites",
+    response_model=ListOfArticlesInResponse,
+    name="articles:get-user-favorites",
+)
+async def get_favorited_articles_for_user(
+    favorite_filters: FavoriteFeedFilters = Depends(get_favorite_feed_filters),
+    user: User = Depends(get_current_user_authorizer()),
+    articles_repo: ArticlesRepository = Depends(get_repository(ArticlesRepository)),
+) -> ListOfArticlesInResponse:
+    articles = await articles_repo.get_favorited_articles_for_user(
+        user=user,
+        limit=favorite_filters.limit,
+        offset=favorite_filters.offset,
+        tag=favorite_filters.tag,
     )
     articles_for_response = [
         ArticleForResponse(**article.dict()) for article in articles

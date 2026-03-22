@@ -83,7 +83,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          ANTHROPIC_MODEL: claude-sonnet-4-6
           SPECK_JSON: ${{ needs.decompose.outputs.result }}
           PHASE_NUM: ${{ matrix.phase.phase }}
         run: |
@@ -96,11 +95,12 @@ jobs:
             AGENT=$(echo "$TASK" | jq -r '.suggested_agent.source // empty')
             ENTRY=$(echo "$TASK" | jq -r '.suggested_agent.entrypoint // "assist"')
             DESC=$(echo "$TASK" | jq -r '.description')
+            MODEL=$(echo "$TASK" | jq -r '.suggested_model')
 
-            echo "--- [$(echo "$TASK" | jq -r '.id')] $(echo "$TASK" | jq -r '.title') ---"
+            echo "--- [$(echo "$TASK" | jq -r '.id')] $(echo "$TASK" | jq -r '.title') (model=$MODEL) ---"
             [ -z "$AGENT" ] && echo "Skipping: no agent" && continue
 
-            dagger call -m "$AGENT" --source=. "$ENTRY" --assignment="$DESC" export --path=.
+            ANTHROPIC_MODEL="$MODEL" dagger call -m "$AGENT" --source=. "$ENTRY" --assignment="$DESC" export --path=.
           done
 
           # Create PR from accumulated changes using github-issue module

@@ -19,7 +19,7 @@ jobs:
     outputs:
       result: ${{ steps.run.outputs.result }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dagger/dagger-for-github@v8.4.1
         with:
           verb: version
@@ -75,7 +75,7 @@ jobs:
       max-parallel: 3
       fail-fast: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: dagger/dagger-for-github@v8.4.1
         with:
           verb: version

@@ -101,15 +101,7 @@ jobs:
             echo "--- [$(echo "$TASK" | jq -r '.id')] $(echo "$TASK" | jq -r '.title') (model=$MODEL) ---"
             [ -z "$AGENT" ] && echo "Skipping: no agent" && continue
 
-            # Map task description to the correct parameter per entrypoint
-            ARGS=""
-            case "$ENTRY" in
-              assist)      ARGS="--assignment=$DESC" ;;
-              write-tests) ARGS="--target=$DESC" ;;
-              review)      ARGS="--focus=$DESC" ;;
-            esac
-
-            ANTHROPIC_MODEL="$MODEL" dagger call -m "$AGENT" --allow-llm=all --source=. "$ENTRY" $ARGS export --path=.
+            ANTHROPIC_MODEL="$MODEL" dagger call -m "$AGENT" --allow-llm=all --source=. "$ENTRY" --assignment="$DESC" export --path=.
           done
 
           # Create PR from accumulated changes using github-issue module

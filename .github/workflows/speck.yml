@@ -94,7 +94,7 @@ jobs:
           for i in $(seq 0 $(( $(echo "$TASKS" | jq 'length') - 1 ))); do
             TASK=$(echo "$TASKS" | jq -c ".[$i]")
             AGENT=$(echo "$TASK" | jq -r '.suggested_agent.source // empty')
-            ENTRY=$(echo "$TASK" | jq -r '.suggested_agent.entrypoint // "assist"')
+            ENTRY=$(echo "$TASK" | jq -r '.suggested_agent.entrypoint // "assist"' | tr '_' '-')
             DESC=$(echo "$TASK" | jq -r '.description')
             MODEL=$(echo "$TASK" | jq -r '.suggested_model')
 

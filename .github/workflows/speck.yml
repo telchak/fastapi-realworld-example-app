@@ -50,8 +50,8 @@ jobs:
       - name: Post summary to issue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RESULT: ${{ steps.run.outputs.result }}
         run: |
-          RESULT='${{ steps.run.outputs.result }}'
           TASKS=$(echo "$RESULT" | jq '.total_tasks')
           PHASES=$(echo "$RESULT" | jq '.execution_plan.total_phases')
           PRETTY=$(echo "$RESULT" | jq '.')

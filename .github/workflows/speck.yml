@@ -41,7 +41,7 @@ jobs:
             --create-pr \
             --include-tests \
             --include-review \
-            --agents='[{"name":"monty","source":"github.com/telchak/daggerverse/monty","specialization":"Python backend development","capabilities":["assist","review","write_tests","build","upgrade"]}]' \
+            --agents='[{"name":"monty","source":"github.com/telchak/daggerverse/monty@feat/speck","specialization":"Python backend development","capabilities":["assist","review","write_tests","build","upgrade"]}]' \
             --tech-stack="Python, FastAPI, PostgreSQL" \
             > /tmp/speck.json
 

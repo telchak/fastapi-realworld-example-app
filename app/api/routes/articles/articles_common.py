@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from starlette import status
 
@@ -32,6 +34,33 @@ async def get_articles_for_user_feed(
 ) -> ListOfArticlesInResponse:
     articles = await articles_repo.get_articles_for_user_feed(
         user=user,
+        limit=limit,
+        offset=offset,
+    )
+    articles_for_response = [
+        ArticleForResponse(**article.dict()) for article in articles
+    ]
+    return ListOfArticlesInResponse(
+        articles=articles_for_response,
+        articles_count=len(articles),
+    )
+
+
+@router.get(
+    "/favorites",
+    response_model=ListOfArticlesInResponse,
+    name="articles:get-user-favorites",
+)
+async def get_favorited_articles_for_user(
+    limit: int = Query(DEFAULT_ARTICLES_LIMIT, ge=1),
+    offset: int = Query(DEFAULT_ARTICLES_OFFSET, ge=0),
+    tag: Optional[str] = Query(None),
+    user: User = Depends(get_current_user_authorizer()),
+    articles_repo: ArticlesRepository = Depends(get_repository(ArticlesRepository)),
+) -> ListOfArticlesInResponse:
+    articles = await articles_repo.get_favorited_articles_for_user(
+        user=user,
+        tag=tag,
         limit=limit,
         offset=offset,
     )

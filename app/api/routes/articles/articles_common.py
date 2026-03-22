@@ -44,6 +44,31 @@ async def get_articles_for_user_feed(
     )
 
 
+@router.get(
+    "/favorites",
+    response_model=ListOfArticlesInResponse,
+    name="articles:get-user-favorites",
+)
+async def get_user_favorites(
+    limit: int = Query(DEFAULT_ARTICLES_LIMIT, ge=1),
+    offset: int = Query(DEFAULT_ARTICLES_OFFSET, ge=0),
+    user: User = Depends(get_current_user_authorizer()),
+    articles_repo: ArticlesRepository = Depends(get_repository(ArticlesRepository)),
+) -> ListOfArticlesInResponse:
+    articles = await articles_repo.get_user_favorites(
+        user=user,
+        limit=limit,
+        offset=offset,
+    )
+    articles_for_response = [
+        ArticleForResponse(**article.dict()) for article in articles
+    ]
+    return ListOfArticlesInResponse(
+        articles=articles_for_response,
+        articles_count=len(articles),
+    )
+
+
 @router.post(
     "/{slug}/favorite",
     response_model=ArticleInResponse,

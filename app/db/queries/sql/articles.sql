@@ -107,10 +107,33 @@ SELECT a.id,
            WHERE id = a.author_id
        ) AS author_username
 FROM articles a
-         INNER JOIN followers_to_followings f ON
-        f.following_id = a.author_id AND
-        f.follower_id = (SELECT id FROM users WHERE username = :follower_username)
+       INNER JOIN followers_to_followings f ON
+      f.following_id = a.author_id AND
+      f.follower_id = (SELECT id FROM users WHERE username = :follower_username)
 ORDER BY a.created_at
+LIMIT :limit
+OFFSET
+:offset;
+
+
+-- name: get-user-favorites
+SELECT a.id,
+       a.slug,
+       a.title,
+       a.description,
+       a.body,
+       a.created_at,
+       a.updated_at,
+       (
+           SELECT username
+           FROM users
+           WHERE id = a.author_id
+       ) AS author_username
+FROM articles a
+       INNER JOIN favorites f ON
+      f.article_id = a.id AND
+      f.user_id = (SELECT id FROM users WHERE username = :username)
+ORDER BY a.created_at DESC
 LIMIT :limit
 OFFSET
 :offset;

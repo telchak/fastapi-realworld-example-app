@@ -41,3 +41,9 @@ class ArticlesFilters(BaseModel):
     favorited: Optional[str] = None
     limit: int = Field(DEFAULT_ARTICLES_LIMIT, ge=1)
     offset: int = Field(DEFAULT_ARTICLES_OFFSET, ge=0)
+
+
+class FavoriteFeedFilters(BaseModel):
+    tag: Optional[str] = None
+    limit: int = Field(DEFAULT_ARTICLES_LIMIT, ge=1)
+    offset: int = Field(DEFAULT_ARTICLES_OFFSET, ge=0)
